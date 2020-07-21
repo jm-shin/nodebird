@@ -5,6 +5,7 @@ const fs = require('fs');
 
 const { Post, Hashtag, User } = require('../models');
 const { isLoggedIn } = require('./middlewares');
+const { EROFS } = require('constants');
 
 const router = express.Router();
 
@@ -43,8 +44,8 @@ router.post('/', isLoggedIn, upload2.none(), async (req, res, next) => {
         });
         const hashtags = req.body.content.match(/#[^\s]*/g);
         if (hashtags) {
-            const result = await Promise.all(hashtags.map(tag => Hashtag.findORCreate({
-                where: { title: tag.silce(1).toLowerCase() },
+            const result = await Promise.all(hashtags.map(tag => Hashtag.findOrCreate({
+                where: { title: tag.slice(1).toLowerCase() },
             })));
             await post.addHashtags(result.map(r => r[0]));
         }
@@ -52,6 +53,28 @@ router.post('/', isLoggedIn, upload2.none(), async (req, res, next) => {
     } catch (error) {
         console.error(error);
         next(error);
+    }
+});
+
+router.get('/hashtag', async (req, res, next) => {
+    const query = req.query.hashtag;
+    if (!query) {
+        return res.redirect('/');
+    }
+    try {
+        const hashtag = await Hashtag.findOne({ where: {title: query} });
+        let posts = [];
+        if (hashtag) {
+            posts = await hashtag.getPosts({ include: [{model: User}] });
+        }
+        return res.render('main', {
+            title: `${query} | NodeBird`,
+            user: req.user,
+            twits: posts,
+        });
+    } catch (error) {
+        console.error(error);
+        return next(error);
     }
 });
 

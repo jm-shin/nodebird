@@ -22,7 +22,7 @@ router.get('/', (req, res, next) => {
       model: User,
       attributes: ['id', 'nick'],
     },
-    order: [['creatAt', 'DESC']],
+    order: [['createdAt', 'DESC']],
   }).then((post) => {
     res.render('main', {
       title: 'NodeBird',
