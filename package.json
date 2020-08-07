@@ -4,7 +4,8 @@
   "description": "\"SNS\"",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app"
+    "start": "nodemon app",
+    "test": "jest"
   },
   "author": "jongmin",
   "license": "MIT",
@@ -25,6 +26,7 @@
     "sequelize": "^6.3.3"
   },
   "devDependencies": {
+    "jest": "^26.2.2",
     "nodemon": "^2.0.4"
   }
 }
